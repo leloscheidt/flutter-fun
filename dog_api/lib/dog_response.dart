@@ -1,4 +1,8 @@
+import 'dart:convert';
 
+import 'package:http/http.dart' as http;
+
+final String dogApi = 'https://dog.ceo/api/breeds/image/random';
 
 class DogResponse {
   final String status;
@@ -11,5 +15,15 @@ class DogResponse {
       status: json['status'],
       message: json['message'],
     );
+  }
+}
+
+Future<DogResponse> fetch() async {
+  final response = await http.get(dogApi);
+
+  if (response.statusCode == 200) {
+    return DogResponse.fromJson(json.decode(response.body));
+  } else {
+    throw Exception('Failed to load dog.');
   }
 }

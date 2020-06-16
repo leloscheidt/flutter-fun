@@ -1,8 +1,14 @@
-import 'package:dogapi/dog_response.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'dart:convert';
+
+import 'package:flutter/material.dart';
+
+import 'dog_response.dart';
+import 'i18n/localization.dart';
+
+// TODO: put somewhere else...
+String t(BuildContext c, String key) {
+  return CustomLocalization.of(c).get(key);
+}
 
 void main() {
   runApp(MyApp());
@@ -12,31 +18,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My Doggy',
+      onGenerateTitle: (BuildContext context) => t(context, 'title'),
+      localizationsDelegates: delegates(),
+      supportedLocales: supported(),
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.teal,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'My Doggy'),
+      home: MyHomePage(),
     );
   }
 }
 
-Future<DogResponse> fetch() async {
-  final response =
-  await http.get('https://dog.ceo/api/breeds/image/random');
-
-  if (response.statusCode == 200) {
-    return DogResponse.fromJson(json.decode(response.body));
-  } else {
-    throw Exception('Failed to load dog');
-  }
-}
-
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -49,28 +43,30 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(t(context, 'title')),
       ),
       body: SafeArea(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              FutureBuilder<DogResponse> (
+              FutureBuilder<DogResponse>(
                 future: dog,
                 builder: (context, snapshot) {
-                  if(snapshot.hasData) {
+                  if (snapshot.hasData) {
                     return Image.network(snapshot.data.message);
                   } else {
-                    print(snapshot.error.toString());
-                    return Text("No internet connection");
+                    print('${snapshot.error}');
+                    return Text(t(context, 'error.no-internet'));
                   }
                 },
               ),
-              SizedBox(height: 10.0,),
+              SizedBox(
+                height: 10.0,
+              ),
               FlatButton(
-                color: Colors.blue,
-                child: Text('Get my Doggy'),
+                color: Colors.teal,
+                child: Text(t(context, 'main-button')),
                 onPressed: () {
                   setState(() {
                     dog = fetch();
