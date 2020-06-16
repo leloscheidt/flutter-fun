@@ -62,6 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   if(snapshot.hasData) {
                     return Image.network(snapshot.data.message);
                   } else {
+                    print(snapshot.error.toString());
                     return Text("No internet connection");
                   }
                 },
@@ -76,7 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   });
                 },
               ),
-              
             ],
           ),
         ),
